@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { useQuiz } from '../hooks/useQuiz';
 import { QuestionCard } from './QuestionCard';
 import { ProgressBar } from './ProgressBar';
-import type { AppView, PartyScore } from '../types';
+import type { Answer, AppView, PartyScore } from '../types';
 
 interface Props {
-  onComplete: (scores: PartyScore[]) => void;
+  onComplete: (scores: PartyScore[], answers: Record<string, Answer>) => void;
   onNavigate: (view: AppView) => void;
 }
 
@@ -15,9 +15,9 @@ export function Quiz({ onComplete, onNavigate }: Props) {
 
   useEffect(() => {
     if (completed && scores.length > 0) {
-      onComplete(scores);
+      onComplete(scores, answers);
     }
-  }, [completed, scores, onComplete]);
+  }, [completed, scores, answers, onComplete]);
 
   return (
     <div className="min-h-screen flex flex-col">
