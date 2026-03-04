@@ -28,7 +28,7 @@ export function Landing({ onNavigate }: Props) {
             ¿A quién voto?
           </h1>
           <p className="text-lg md:text-xl text-gray-400 max-w-lg mx-auto">
-            Responde 25 preguntas sobre los temas que importan y descubre qué partido político se alinea más con tus ideas.
+            Responde preguntas sobre los temas que importan y descubre qué partido político se alinea más con tus ideas.
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -47,7 +47,7 @@ export function Landing({ onNavigate }: Props) {
           <h2 className="text-2xl font-bold text-center text-white mb-10">¿Cómo funciona?</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: '1', icon: '📝', title: 'Responde preguntas', desc: '25 preguntas sobre temas clave: economía, sanidad, vivienda, inmigración...' },
+              { step: '1', icon: '📝', title: 'Responde preguntas', desc: 'Preguntas sobre temas clave: economía, sanidad, vivienda, inmigración...' },
               { step: '2', icon: '🧮', title: 'Calculamos afinidad', desc: 'Comparamos tus respuestas con las posiciones reales de cada partido.' },
               { step: '3', icon: '🎯', title: 'Descubre tu partido', desc: 'Ranking con % de afinidad, desglose por temas y las razones de cada resultado.' },
             ].map((item) => (
