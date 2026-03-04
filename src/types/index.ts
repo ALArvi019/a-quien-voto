@@ -1,16 +1,13 @@
 export type PartyId = 'pp' | 'psoe' | 'vox' | 'podemos' | 'salf';
 
 export type CategoryId =
-  | 'immigration'
+  | 'country_world'
   | 'economy'
-  | 'health'
-  | 'housing'
-  | 'security'
-  | 'education'
-  | 'environment'
-  | 'social_rights'
-  | 'territorial'
-  | 'transparency';
+  | 'personal_values'
+  | 'society'
+  | 'religion'
+  | 'rights_freedoms'
+  | 'security';
 
 export interface Party {
   id: PartyId;
@@ -29,12 +26,17 @@ export interface Category {
   icon: string;
 }
 
+export type CompassAxis = 'economic' | 'social';
+
 export interface Question {
   id: string;
   category: CategoryId;
   text: string;
   explanation: string;
   partyPositions: Record<PartyId, number>;
+  axis: CompassAxis;
+  /** +1 means agreeing pushes right/authoritarian, -1 means agreeing pushes left/libertarian */
+  direction: 1 | -1;
 }
 
 export type Answer = -2 | -1 | 0 | 1 | 2;
