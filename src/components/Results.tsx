@@ -1,15 +1,20 @@
 import { motion } from 'framer-motion';
-import type { AppView, PartyScore } from '../types';
+import type { Answer, AppView, PartyScore } from '../types';
 import { PartyCard } from './PartyCard';
+import { PoliticalCompass } from './PoliticalCompass';
 import { partyMap } from '../data/parties';
+import { calculateCompassPosition } from '../utils/compass';
+import { questions } from '../data/questions';
 
 interface Props {
   scores: PartyScore[];
+  answers: Record<string, Answer>;
   onNavigate: (view: AppView) => void;
 }
 
-export function Results({ scores, onNavigate }: Props) {
+export function Results({ scores, answers, onNavigate }: Props) {
   const topParty = scores[0] ? partyMap[scores[0].partyId] : null;
+  const compassCoords = calculateCompassPosition(questions, answers);
 
   return (
     <div className="min-h-screen">
@@ -41,6 +46,8 @@ export function Results({ scores, onNavigate }: Props) {
             <p className="text-gray-400 max-w-md mx-auto text-sm">{topParty.description}</p>
           </motion.div>
         )}
+
+        <PoliticalCompass coords={compassCoords} />
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-300">Ranking completo</h2>
