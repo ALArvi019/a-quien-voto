@@ -32,7 +32,7 @@ export function Landing({ onNavigate, onLoadSaved }: Props) {
             ¿A quién voto?
           </h1>
           <p className="text-lg text-gray-400 max-w-md mx-auto">
-            73 preguntas sobre los temas que importan. Descubre qué partido se alinea más con tus ideas.
+            Responde preguntas sobre los temas que importan y descubre qué partido se alinea más con tus ideas.
           </p>
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -111,7 +111,7 @@ export function Landing({ onNavigate, onLoadSaved }: Props) {
           <ol className="space-y-4 text-sm text-gray-400">
             <li className="flex gap-3">
               <span className="text-white font-bold shrink-0">1.</span>
-              <span>Responde 73 preguntas sobre economía, sanidad, vivienda, inmigración y más.</span>
+              <span>Responde preguntas sobre economía, sanidad, vivienda, inmigración y más.</span>
             </li>
             <li className="flex gap-3">
               <span className="text-white font-bold shrink-0">2.</span>

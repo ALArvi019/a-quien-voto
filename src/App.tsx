@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import type { AppView, PartyScore, SavedQuiz } from './types';
+import type { Answer, AppView, PartyScore, SavedQuiz } from './types';
 import { Landing } from './components/Landing';
 import { Quiz } from './components/Quiz';
 import { Results } from './components/Results';
@@ -12,6 +12,7 @@ import { saveQuiz } from './lib/storage';
 function App() {
   const [view, setView] = useState<AppView>('landing');
   const [scores, setScores] = useState<PartyScore[]>([]);
+  const [answers, setAnswers] = useState<Record<string, Answer>>({});
 
   const navigate = useCallback((v: AppView) => {
     setView(v);
@@ -19,9 +20,10 @@ function App() {
   }, []);
 
   const handleQuizComplete = useCallback(
-    (s: PartyScore[], answers: Record<string, number>) => {
+    (s: PartyScore[], a: Record<string, Answer>) => {
       setScores(s);
-      saveQuiz(answers as Record<string, -2 | -1 | 0 | 1 | 2>, s);
+      setAnswers(a);
+      saveQuiz(a as Record<string, -2 | -1 | 0 | 1 | 2>, s);
       navigate('results');
     },
     [navigate]
@@ -47,7 +49,7 @@ function App() {
         >
           {view === 'landing' && <Landing onNavigate={navigate} onLoadSaved={handleLoadSaved} />}
           {view === 'quiz' && <Quiz onComplete={handleQuizComplete} onNavigate={navigate} />}
-          {view === 'results' && <Results scores={scores} onNavigate={navigate} />}
+          {view === 'results' && <Results scores={scores} answers={answers} onNavigate={navigate} />}
           {view === 'province' && <ProvinceSelector scores={scores} onNavigate={navigate} />}
           {view === 'statistics' && <Statistics onNavigate={navigate} />}
         </motion.div>
