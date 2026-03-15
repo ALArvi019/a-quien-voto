@@ -16,7 +16,7 @@ export function ProgressBar({ current, total }: Props) {
       </div>
       <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
         <motion.div
-          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+          className="h-full bg-white rounded-full"
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.4, ease: 'easeOut' }}

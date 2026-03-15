@@ -28,7 +28,7 @@ export function ProvinceStats({ data }: Props) {
             const avg = data.avgScores[party.id] || 0;
             return (
               <div key={party.id} className="flex items-center gap-3">
-                <img src={party.logo} alt={party.shortName} className="w-7 h-7 rounded-lg" />
+                <img src={party.logo} alt={party.shortName} className="w-7 h-7 rounded-lg" loading="lazy" />
                 <span className="w-20 text-sm text-gray-300">{party.shortName}</span>
                 <div className="flex-1 h-3 bg-gray-800 rounded-full overflow-hidden">
                   <motion.div

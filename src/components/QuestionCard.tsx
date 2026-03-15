@@ -43,12 +43,14 @@ export function QuestionCard({ question, onAnswer, currentAnswer }: Props) {
           </p>
         </div>
 
-        <div className="grid gap-3">
+        <div role="radiogroup" aria-label="Tu respuesta" className="grid gap-3">
           {answerOptions.map((opt) => (
             <button
               key={opt.value}
+              role="radio"
+              aria-checked={currentAnswer === opt.value}
               onClick={() => onAnswer(question.id, opt.value)}
-              className={`w-full text-left px-5 py-3 rounded-xl text-white font-medium transition-all duration-200 cursor-pointer
+              className={`w-full text-left px-5 py-3 rounded-xl text-white font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950 outline-none
                 ${currentAnswer === opt.value
                   ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-950 scale-[1.02]'
                   : ''

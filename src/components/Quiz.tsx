@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { useQuiz } from '../hooks/useQuiz';
 import { QuestionCard } from './QuestionCard';
 import { ProgressBar } from './ProgressBar';
-import type { AppView, PartyScore } from '../types';
+import type { Answer, AppView, PartyScore } from '../types';
 
 interface Props {
-  onComplete: (scores: PartyScore[]) => void;
+  onComplete: (scores: PartyScore[], answers: Record<string, Answer>) => void;
   onNavigate: (view: AppView) => void;
 }
 
@@ -15,9 +15,9 @@ export function Quiz({ onComplete, onNavigate }: Props) {
 
   useEffect(() => {
     if (completed && scores.length > 0) {
-      onComplete(scores);
+      onComplete(scores, answers);
     }
-  }, [completed, scores, onComplete]);
+  }, [completed, scores, answers, onComplete]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -25,11 +25,11 @@ export function Quiz({ onComplete, onNavigate }: Props) {
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
             onClick={() => onNavigate('landing')}
-            className="text-gray-400 hover:text-white transition-colors cursor-pointer"
+            className="text-gray-400 hover:text-white transition-colors"
           >
             ← Inicio
           </button>
-          <span className="text-sm text-gray-500">¿A quién voto?</span>
+          <span className="text-sm text-gray-400">¿A quién voto?</span>
         </div>
       </header>
 
@@ -48,7 +48,7 @@ export function Quiz({ onComplete, onNavigate }: Props) {
           {currentIndex > 0 && (
             <button
               onClick={goBack}
-              className="text-sm text-gray-500 hover:text-gray-300 transition-colors cursor-pointer"
+              className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
             >
               ← Pregunta anterior
             </button>

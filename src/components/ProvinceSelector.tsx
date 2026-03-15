@@ -42,11 +42,11 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
             onClick={() => onNavigate('results')}
-            className="text-gray-400 hover:text-white transition-colors cursor-pointer"
+            className="text-gray-400 hover:text-white transition-colors"
           >
             ← Resultados
           </button>
-          <span className="text-sm text-gray-500">Selecciona tu provincia</span>
+          <span className="text-sm text-gray-400">Selecciona tu provincia</span>
         </div>
       </header>
 
@@ -69,7 +69,9 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
 
         {/* Province dropdown for mobile */}
         <div className="sm:hidden">
+          <label htmlFor="province-select" className="sr-only">Selecciona tu provincia</label>
           <select
+            id="province-select"
             value={selectedProvince ?? ''}
             onChange={(e) => setSelectedProvince(e.target.value || null)}
             className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white"
@@ -86,6 +88,7 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center space-y-4"
+            aria-live="polite"
           >
             <p className="text-lg text-white">
               Provincia seleccionada: <strong>{selectedName}</strong>
@@ -98,7 +101,7 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
                 </p>
                 <button
                   onClick={() => onNavigate('statistics')}
-                  className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-colors cursor-pointer"
+                  className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-colors"
                 >
                   Ver estadísticas →
                 </button>
@@ -107,7 +110,7 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold rounded-xl transition-colors cursor-pointer"
+                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors"
               >
                 {saving ? 'Guardando...' : 'Enviar resultados anónimos'}
               </button>
@@ -118,9 +121,9 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
         <div className="text-center pt-4">
           <button
             onClick={() => onNavigate('results')}
-            className="text-sm text-gray-500 hover:text-gray-300 transition-colors cursor-pointer"
+            className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
           >
-            Omitir y volver a resultados
+            Volver a resultados
           </button>
         </div>
       </main>

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { provinces } from '../data/provinces';
 
 interface Props {
@@ -23,6 +22,8 @@ export function SpainMap({ selected, onSelect, colorMap }: Props) {
         viewBox="0 0 1000 800"
         className="w-full h-auto"
         xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-label="Mapa de España por provincias"
       >
         {provinces.map((prov) => {
           const isSelected = selected === prov.id;
@@ -30,14 +31,13 @@ export function SpainMap({ selected, onSelect, colorMap }: Props) {
           const fillColor = colorMap?.[prov.id] || (isSelected ? '#3b82f6' : '#374151');
 
           return (
-            <motion.path
+            <path
               key={prov.id}
               d={prov.path}
               fill={fillColor}
               stroke="#1f2937"
               strokeWidth={isSelected || isHovered ? 2 : 1}
-              className="cursor-pointer transition-colors"
-              whileHover={{ scale: 1.02, originX: '50%', originY: '50%' }}
+              className="transition-[fill,opacity,stroke-width] duration-150"
               onClick={() => onSelect(prov.id)}
               onMouseEnter={() => setHovered(prov.id)}
               onMouseLeave={() => setHovered(null)}

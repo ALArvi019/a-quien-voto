@@ -1,7 +1,23 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { AppView, PartyScore } from '../types';
 import { PartyCard } from './PartyCard';
 import { partyMap } from '../data/parties';
+
+function useCountUp(target: number, duration = 800) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    const start = performance.now();
+    function tick(now: number) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }, [target, duration]);
+  return value;
+}
 
 interface Props {
   scores: PartyScore[];
@@ -10,6 +26,7 @@ interface Props {
 
 export function Results({ scores, onNavigate }: Props) {
   const topParty = scores[0] ? partyMap[scores[0].partyId] : null;
+  const animatedScore = useCountUp(scores[0]?.totalScore ?? 0);
 
   return (
     <div className="min-h-screen">
@@ -17,11 +34,11 @@ export function Results({ scores, onNavigate }: Props) {
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
             onClick={() => onNavigate('landing')}
-            className="text-gray-400 hover:text-white transition-colors cursor-pointer"
+            className="text-gray-400 hover:text-white transition-colors"
           >
             ← Inicio
           </button>
-          <span className="text-sm text-gray-500">Resultados</span>
+          <span className="text-sm text-gray-400">Resultados</span>
         </div>
       </header>
 
@@ -37,7 +54,7 @@ export function Results({ scores, onNavigate }: Props) {
             <h1 className="text-3xl md:text-4xl font-bold" style={{ color: topParty.color }}>
               {topParty.name}
             </h1>
-            <p className="text-5xl font-bold text-white">{scores[0].totalScore}%</p>
+            <p className="text-5xl font-bold text-white">{animatedScore}%</p>
             <p className="text-gray-400 max-w-md mx-auto text-sm">{topParty.description}</p>
           </motion.div>
         )}
@@ -52,19 +69,19 @@ export function Results({ scores, onNavigate }: Props) {
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             onClick={() => onNavigate('province')}
-            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors cursor-pointer"
+            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors"
           >
             Seleccionar mi provincia
           </button>
           <button
             onClick={() => onNavigate('statistics')}
-            className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl transition-colors cursor-pointer"
+            className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl transition-colors"
           >
             Ver estadísticas
           </button>
           <button
             onClick={() => onNavigate('landing')}
-            className="flex-1 px-6 py-3 border border-gray-700 hover:border-gray-500 text-gray-300 font-semibold rounded-xl transition-colors cursor-pointer"
+            className="flex-1 px-6 py-3 border border-gray-700 hover:border-gray-500 text-gray-300 font-semibold rounded-xl transition-colors"
           >
             Repetir test
           </button>

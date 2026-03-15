@@ -1,89 +1,145 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import type { AppView } from '../types';
+import type { AppView, SavedQuiz } from '../types';
 import { parties } from '../data/parties';
+import { partyMap } from '../data/parties';
+import { getSavedQuizzes, deleteSavedQuiz } from '../lib/storage';
 
 interface Props {
   onNavigate: (view: AppView) => void;
+  onLoadSaved: (saved: SavedQuiz) => void;
 }
 
-export function Landing({ onNavigate }: Props) {
+export function Landing({ onNavigate, onLoadSaved }: Props) {
+  const [savedQuizzes, setSavedQuizzes] = useState(() => getSavedQuizzes());
+
+  const handleDelete = (id: string) => {
+    deleteSavedQuiz(id);
+    setSavedQuizzes(getSavedQuizzes());
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero */}
-      <section className="flex-1 flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden">
-        {/* Animated background blobs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -left-40 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl animate-pulse [animation-delay:1s]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-red-600/10 rounded-full blur-3xl animate-pulse [animation-delay:2s]" />
-        </div>
-
+      <section className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center space-y-6 relative z-10 max-w-2xl"
+          transition={{ duration: 0.5 }}
+          className="text-center space-y-6 max-w-xl"
         >
-          <h1 className="text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-400 to-red-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight">
             ¿A quién voto?
           </h1>
-          <p className="text-lg md:text-xl text-gray-400 max-w-lg mx-auto">
-            Responde 25 preguntas sobre los temas que importan y descubre qué partido político se alinea más con tus ideas.
+          <p className="text-lg text-gray-400 max-w-md mx-auto">
+            73 preguntas sobre los temas que importan. Descubre qué partido se alinea más con tus ideas.
           </p>
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => onNavigate('quiz')}
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-lg font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all cursor-pointer"
+            className="px-8 py-4 bg-white text-gray-950 text-lg font-bold rounded-xl transition-all hover:bg-gray-100"
           >
             Empezar el test
           </motion.button>
         </motion.div>
       </section>
 
-      {/* How it works */}
-      <section className="px-4 py-16 border-t border-gray-800">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center text-white mb-10">¿Cómo funciona?</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { step: '1', icon: '📝', title: 'Responde preguntas', desc: '25 preguntas sobre temas clave: economía, sanidad, vivienda, inmigración...' },
-              { step: '2', icon: '🧮', title: 'Calculamos afinidad', desc: 'Comparamos tus respuestas con las posiciones reales de cada partido.' },
-              { step: '3', icon: '🎯', title: 'Descubre tu partido', desc: 'Ranking con % de afinidad, desglose por temas y las razones de cada resultado.' },
-            ].map((item) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: Number(item.step) * 0.15 }}
-                className="text-center space-y-3"
-              >
-                <div className="text-4xl">{item.icon}</div>
-                <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-                <p className="text-sm text-gray-400">{item.desc}</p>
-              </motion.div>
-            ))}
+      {/* Previous results */}
+      {savedQuizzes.length > 0 && (
+        <section className="px-4 py-12 border-t border-gray-800">
+          <div className="max-w-xl mx-auto space-y-4">
+            <h2 className="text-lg font-bold text-white">Tests anteriores</h2>
+            <div className="grid gap-3">
+              {savedQuizzes.map((sq) => {
+                const topParty = partyMap[sq.topParty];
+                const date = new Date(sq.date);
+                const dateStr = date.toLocaleDateString('es-ES', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
+                return (
+                  <motion.div
+                    key={sq.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-gray-900 rounded-xl p-4 flex items-center gap-4 border border-gray-800"
+                  >
+                    {topParty && (
+                      <img src={topParty.logo} alt={topParty.shortName} className="w-10 h-10 rounded-lg shrink-0" loading="lazy" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-white">
+                          {topParty?.shortName}
+                        </span>
+                        <span className="font-bold" style={{ color: topParty?.color }}>
+                          {sq.scores[0]?.totalScore}%
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-400">{dateStr}</div>
+                    </div>
+                    <button
+                      onClick={() => onLoadSaved(sq)}
+                      className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-sm text-white rounded-lg transition-colors shrink-0"
+                    >
+                      Ver
+                    </button>
+                    <button
+                      onClick={() => handleDelete(sq.id)}
+                      className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-red-400 transition-colors shrink-0 rounded-lg"
+                      title="Eliminar"
+                      aria-label={`Eliminar test de ${topParty?.shortName}`}
+                    >
+                      ✕
+                    </button>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
+        </section>
+      )}
+
+      {/* How it works */}
+      <section className="px-4 py-12 border-t border-gray-800">
+        <div className="max-w-xl mx-auto space-y-6">
+          <h2 className="text-lg font-bold text-white">¿Cómo funciona?</h2>
+          <ol className="space-y-4 text-sm text-gray-400">
+            <li className="flex gap-3">
+              <span className="text-white font-bold shrink-0">1.</span>
+              <span>Responde 73 preguntas sobre economía, sanidad, vivienda, inmigración y más.</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-white font-bold shrink-0">2.</span>
+              <span>Comparamos tus respuestas con las posiciones reales de cada partido.</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-white font-bold shrink-0">3.</span>
+              <span>Ves tu ranking con % de afinidad y desglose por temas.</span>
+            </li>
+          </ol>
         </div>
       </section>
 
       {/* Parties */}
       <section className="px-4 py-12 border-t border-gray-800">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h2 className="text-2xl font-bold text-white">Partidos incluidos</h2>
-          <div className="flex flex-wrap justify-center gap-6">
+        <div className="max-w-xl mx-auto space-y-4">
+          <h2 className="text-lg font-bold text-white">Partidos incluidos</h2>
+          <div className="flex flex-wrap gap-4">
             {parties.map((party) => (
-              <motion.div
+              <div
                 key={party.id}
-                whileHover={{ scale: 1.1 }}
-                className="flex flex-col items-center gap-2"
+                className="flex items-center gap-2 bg-gray-900 rounded-lg px-3 py-2"
               >
-                <img src={party.logo} alt={party.shortName} className="w-16 h-16 rounded-xl" />
-                <span className="text-sm font-medium" style={{ color: party.color }}>
+                <img src={party.logo} alt={party.shortName} className="w-8 h-8 rounded-md" loading="lazy" />
+                <span className="text-sm font-medium text-gray-300">
                   {party.shortName}
                 </span>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -91,16 +147,16 @@ export function Landing({ onNavigate }: Props) {
 
       {/* Stats link */}
       <section className="px-4 py-12 border-t border-gray-800">
-        <div className="max-w-2xl mx-auto text-center space-y-4">
-          <h2 className="text-xl font-bold text-white">Estadísticas por provincia</h2>
-          <p className="text-sm text-gray-400">
-            Consulta cómo piensan los españoles por provincia, basado en los resultados anónimos del test.
-          </p>
+        <div className="max-w-xl mx-auto flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-bold text-white">Estadísticas por provincia</h2>
+            <p className="text-sm text-gray-400">Resultados anónimos de todos los participantes.</p>
+          </div>
           <button
             onClick={() => onNavigate('statistics')}
-            className="px-6 py-3 border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white rounded-xl transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm text-gray-300 hover:text-white border border-gray-700 hover:border-gray-500 rounded-lg transition-colors shrink-0"
           >
-            Ver estadísticas →
+            Ver →
           </button>
         </div>
       </section>
