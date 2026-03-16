@@ -47,7 +47,7 @@ export function QuestionCard({ question, onAnswer, currentAnswer }: Props) {
             {question.text}
           </h2>
           <p className="text-sm text-gray-400 leading-relaxed">
-            {question.explanation}
+            <span className="font-semibold text-gray-300">Contexto:</span> {question.explanation}
           </p>
         </div>
 
