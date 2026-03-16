@@ -28,7 +28,7 @@ export async function getProvinceStats(): Promise<ProvinceStatData[]> {
     const prov = row.province as string;
     if (!grouped[prov]) {
       grouped[prov] = {
-        scores: { pp: [], psoe: [], vox: [], podemos: [], salf: [] },
+        scores: { pp: [], psoe: [], vox: [], podemos: [], sumar: [], salf: [] },
         count: 0,
       };
     }
@@ -66,7 +66,7 @@ export async function getNationalStats(): Promise<{
   const { data, error } = await supabase.from('results').select('party_scores');
   if (error || !data || data.length === 0) return null;
 
-  const sums: Record<PartyId, number> = { pp: 0, psoe: 0, vox: 0, podemos: 0, salf: 0 };
+  const sums: Record<PartyId, number> = { pp: 0, psoe: 0, vox: 0, podemos: 0, sumar: 0, salf: 0 };
   for (const row of data) {
     const ps = row.party_scores as Record<PartyId, number>;
     for (const pid of Object.keys(ps) as PartyId[]) {

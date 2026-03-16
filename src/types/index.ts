@@ -1,4 +1,4 @@
-export type PartyId = 'pp' | 'psoe' | 'vox' | 'podemos' | 'salf';
+export type PartyId = 'pp' | 'psoe' | 'vox' | 'podemos' | 'sumar' | 'salf';
 
 export type CategoryId =
   | 'country_world'

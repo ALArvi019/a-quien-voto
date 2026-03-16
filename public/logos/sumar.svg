@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="95" fill="#e6007e"/>
+  <text x="100" y="118" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="bold">Sumar</text>
+</svg>

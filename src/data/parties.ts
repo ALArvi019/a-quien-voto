@@ -42,6 +42,16 @@ export const parties: Party[] = [
     website: 'https://podemos.info',
   },
   {
+    id: 'sumar',
+    name: 'Sumar',
+    shortName: 'Sumar',
+    color: '#e6007e',
+    logo: '/a-quien-voto/logos/sumar.png',
+    description: 'Coalición progresista centrada en derechos laborales, feminismo, ecología y justicia social dentro del marco europeo.',
+    ideology: 'Centro-izquierda / Progresista',
+    website: 'https://sumar.es',
+  },
+  {
     id: 'salf',
     name: 'Se Acabó La Fiesta',
     shortName: 'SALF',
