@@ -51,7 +51,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
   <text x="840" y="510" text-anchor="middle" fill="#9ca3af" font-family="system-ui, -apple-system, sans-serif" font-size="16">SALF</text>
 
   <!-- URL -->
-  <text x="${W / 2}" y="${H - 30}" text-anchor="middle" fill="#6b7280" font-family="system-ui, -apple-system, sans-serif" font-size="20">alejandroranking.github.io/a-quien-voto</text>
+  <text x="${W / 2}" y="${H - 30}" text-anchor="middle" fill="#6b7280" font-family="system-ui, -apple-system, sans-serif" font-size="20">alarvi019.github.io/a-quien-voto</text>
 </svg>`;
 
 writeFileSync('public/og-image.svg', svg);

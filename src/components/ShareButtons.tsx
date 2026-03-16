@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import type { PartyScore } from '../types';
 import { partyMap } from '../data/parties';
 
-const SITE_URL = 'https://alejandroranking.github.io/a-quien-voto/';
+const SITE_URL = 'https://alarvi019.github.io/a-quien-voto/';
 const CARD_W = 600;
 const CARD_H = 400;
 
@@ -124,7 +124,7 @@ function drawCard(canvas: HTMLCanvasElement, scores: PartyScore[]) {
   ctx.fillStyle = '#6b7280';
   ctx.font = '500 12px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('¿A quién voto? — Haz el test en alejandroranking.github.io/a-quien-voto', CARD_W / 2, CARD_H - 16);
+  ctx.fillText('¿A quién voto? — Haz el test en alarvi019.github.io/a-quien-voto', CARD_W / 2, CARD_H - 16);
 }
 
 export function ShareButtons({ scores }: Props) {
