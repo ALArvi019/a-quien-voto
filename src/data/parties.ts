@@ -5,7 +5,7 @@ export const parties: Party[] = [
     id: 'pp',
     name: 'Partido Popular',
     shortName: 'PP',
-    color: '#1e40af',
+    color: '#3b82f6',
     logo: '/a-quien-voto/logos/pp.png',
     description: 'Partido de centro-derecha, defensor de la economía de mercado, la unidad de España y valores conservadores.',
     ideology: 'Centro-derecha / Conservador',

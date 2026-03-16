@@ -6,7 +6,7 @@ import { partyMap } from '../data/parties';
 import { parties } from '../data/parties';
 import { SpainMap } from './SpainMap';
 import { ProvinceStats } from './ProvinceStats';
-import { provinceMap } from '../data/provinces';
+import { provinceMap, provinces } from '../data/provinces';
 
 interface Props {
   onNavigate: (view: AppView) => void;
@@ -146,6 +146,20 @@ export function Statistics({ onNavigate }: Props) {
                 onSelect={setSelectedProvince}
                 colorMap={colorMap}
               />
+              <div>
+                <label htmlFor="stats-province-select" className="sr-only">Selecciona una provincia</label>
+                <select
+                  id="stats-province-select"
+                  value={selectedProvince ?? ''}
+                  onChange={(e) => setSelectedProvince(e.target.value || null)}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white"
+                >
+                  <option value="">Selecciona una provincia</option>
+                  {provinces.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Selected province detail */}
@@ -159,10 +173,10 @@ export function Statistics({ onNavigate }: Props) {
                   <table className="w-full text-sm min-w-[500px]">
                     <thead>
                       <tr className="border-b border-gray-800 text-gray-400">
-                        <th className="text-left py-2 px-2">Provincia</th>
-                        <th className="text-center py-2 px-1">N</th>
+                        <th scope="col" className="text-left py-2 px-2">Provincia</th>
+                        <th scope="col" className="text-center py-2 px-1">N</th>
                         {parties.map((p) => (
-                          <th key={p.id} className="text-center py-2 px-1" style={{ color: p.color }}>
+                          <th scope="col" key={p.id} className="text-center py-2 px-1" style={{ color: p.color }}>
                             {p.shortName}
                           </th>
                         ))}

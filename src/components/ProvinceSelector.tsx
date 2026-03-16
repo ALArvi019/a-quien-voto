@@ -79,8 +79,8 @@ export function ProvinceSelector({ scores, onNavigate, onProvinceSaved }: Props)
 
         <SpainMap selected={selectedProvince ?? undefined} onSelect={setSelectedProvince} />
 
-        {/* Province dropdown for mobile */}
-        <div className="sm:hidden">
+        {/* Province dropdown (alternative to map) */}
+        <div>
           <label htmlFor="province-select" className="sr-only">Selecciona tu provincia</label>
           <select
             id="province-select"
@@ -124,7 +124,7 @@ export function ProvinceSelector({ scores, onNavigate, onProvinceSaved }: Props)
           <div className="text-center pt-2">
             <button
               onClick={onProvinceSaved}
-              className="py-2 min-h-[44px] text-sm text-gray-500 hover:text-gray-400 transition-colors underline underline-offset-4"
+              className="py-2 min-h-[44px] text-sm text-gray-400 hover:text-gray-300 transition-colors underline underline-offset-4"
             >
               Saltar y ver resultados sin contribuir
             </button>
