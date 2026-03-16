@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import type { Answer, AppView, PartyScore } from '../types';
 import { PartyCard } from './PartyCard';
 import { PoliticalCompass } from './PoliticalCompass';
+import { ShareButtons } from './ShareButtons';
 import { partyMap } from '../data/parties';
 import { calculateCompassPosition } from '../utils/compass';
 import { questions } from '../data/questions';
@@ -49,13 +50,13 @@ export function Results({ scores, answers, onNavigate }: Props) {
             aria-label="Volver a inicio"
             className="py-2 px-3 min-h-[44px] flex items-center text-gray-400 hover:text-white transition-colors"
           >
-            ← Inicio
+            <span aria-hidden="true">←</span> Inicio
           </button>
           <span className="text-sm text-gray-400">Resultados</span>
         </div>
       </header>
 
-      <main ref={mainRef} tabIndex={-1} className="max-w-2xl mx-auto px-4 py-8 space-y-8 outline-none">
+      <main ref={mainRef} tabIndex={-1} aria-label="Resultados del test" className="max-w-2xl mx-auto px-4 py-8 space-y-8 outline-none">
         {scores.length === 0 ? (
           <div className="text-center py-16 space-y-4">
             <p className="text-gray-400">No hay resultados disponibles.</p>
@@ -90,10 +91,16 @@ export function Results({ scores, answers, onNavigate }: Props) {
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-300">Ranking completo</h2>
-          {scores.map((s, i) => (
-            <PartyCard key={s.partyId} score={s} rank={i} />
-          ))}
+          <ol className="space-y-4" aria-label="Ranking de partidos por afinidad">
+            {scores.map((s, i) => (
+              <li key={s.partyId}><PartyCard score={s} rank={i} /></li>
+            ))}
+          </ol>
         </div>
+
+        {topParty && scores[0] && (
+          <ShareButtons scores={scores} />
+        )}
 
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
