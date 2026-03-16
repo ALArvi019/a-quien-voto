@@ -63,7 +63,6 @@ export interface Reason {
 export interface ProvinceData {
   id: string;
   name: string;
-  path: string;
 }
 
 export interface ResultRecord {

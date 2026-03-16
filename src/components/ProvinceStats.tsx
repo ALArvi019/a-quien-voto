@@ -1,12 +1,15 @@
 import { motion } from 'framer-motion';
 import type { ProvinceStatData } from '../types';
 import { parties } from '../data/parties';
+import { provinceMap } from '../data/provinces';
 
 interface Props {
   data: ProvinceStatData;
 }
 
 export function ProvinceStats({ data }: Props) {
+  const provinceName = provinceMap[data.province]?.name ?? data.province;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -14,8 +17,8 @@ export function ProvinceStats({ data }: Props) {
       className="bg-gray-900 rounded-2xl p-6 space-y-4"
     >
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-bold text-white capitalize">
-          {data.province.replace(/-/g, ' ')}
+        <h3 className="text-lg font-bold text-white">
+          {provinceName}
         </h3>
         <span className="text-sm text-gray-400">{data.total} participantes</span>
       </div>

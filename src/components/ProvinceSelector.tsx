@@ -8,16 +8,16 @@ import { saveResult } from '../lib/supabase';
 interface Props {
   scores: PartyScore[];
   onNavigate: (view: AppView) => void;
+  onProvinceSaved: () => void;
 }
 
-export function ProvinceSelector({ scores, onNavigate }: Props) {
+export function ProvinceSelector({ scores, onNavigate, onProvinceSaved }: Props) {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   const selectedName = provinces.find((p) => p.id === selectedProvince)?.name;
 
-  const handleSave = async () => {
+  const handleConfirm = async () => {
     if (!selectedProvince || scores.length === 0) return;
     setSaving(true);
 
@@ -33,7 +33,7 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
     });
 
     setSaving(false);
-    setSaved(true);
+    onProvinceSaved();
   };
 
   return (
@@ -41,10 +41,10 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
       <header className="px-4 py-4 border-b border-gray-800">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
-            onClick={() => onNavigate('results')}
+            onClick={() => onNavigate('landing')}
             className="text-gray-400 hover:text-white transition-colors"
           >
-            ← Resultados
+            ← Inicio
           </button>
           <span className="text-sm text-gray-400">Selecciona tu provincia</span>
         </div>
@@ -57,10 +57,10 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
           className="text-center space-y-2"
         >
           <h1 className="text-2xl font-bold text-white">
-            Contribuye a las estadísticas
+            Antes de ver tus resultados...
           </h1>
           <p className="text-sm text-gray-400 max-w-md mx-auto">
-            Selecciona tu provincia en el mapa para contribuir anónimamente.
+            Selecciona tu provincia para contribuir anónimamente a las estadísticas.
             Solo guardamos tu provincia y los % de afinidad, nada más.
           </p>
         </motion.div>
@@ -91,41 +91,29 @@ export function ProvinceSelector({ scores, onNavigate }: Props) {
             aria-live="polite"
           >
             <p className="text-lg text-white">
-              Provincia seleccionada: <strong>{selectedName}</strong>
+              Provincia: <strong>{selectedName}</strong>
             </p>
 
-            {saved ? (
-              <div className="space-y-3">
-                <p className="text-green-400 font-semibold">
-                  ¡Gracias por contribuir!
-                </p>
-                <button
-                  onClick={() => onNavigate('statistics')}
-                  className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-colors"
-                >
-                  Ver estadísticas →
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors"
-              >
-                {saving ? 'Guardando...' : 'Enviar resultados anónimos'}
-              </button>
-            )}
+            <button
+              onClick={handleConfirm}
+              disabled={saving}
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors"
+            >
+              {saving ? 'Guardando...' : 'Ver mis resultados →'}
+            </button>
           </motion.div>
         )}
 
-        <div className="text-center pt-4">
-          <button
-            onClick={() => onNavigate('results')}
-            className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
-          >
-            Volver a resultados
-          </button>
-        </div>
+        {!selectedName && (
+          <div className="text-center pt-2">
+            <button
+              onClick={onProvinceSaved}
+              className="text-sm text-gray-500 hover:text-gray-400 transition-colors underline underline-offset-4"
+            >
+              Saltar y ver resultados sin contribuir
+            </button>
+          </div>
+        )}
       </main>
     </div>
   );

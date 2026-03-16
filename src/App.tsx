@@ -24,10 +24,14 @@ function App() {
       setScores(s);
       setAnswers(a);
       saveQuiz(a as Record<string, -2 | -1 | 0 | 1 | 2>, s);
-      navigate('results');
+      navigate('province'); // Force province selection before results
     },
     [navigate]
   );
+
+  const handleProvinceSelected = useCallback(() => {
+    navigate('results');
+  }, [navigate]);
 
   const handleLoadSaved = useCallback(
     (saved: SavedQuiz) => {
@@ -50,7 +54,13 @@ function App() {
           {view === 'landing' && <Landing onNavigate={navigate} onLoadSaved={handleLoadSaved} />}
           {view === 'quiz' && <Quiz onComplete={handleQuizComplete} onNavigate={navigate} />}
           {view === 'results' && <Results scores={scores} answers={answers} onNavigate={navigate} />}
-          {view === 'province' && <ProvinceSelector scores={scores} onNavigate={navigate} />}
+          {view === 'province' && (
+            <ProvinceSelector
+              scores={scores}
+              onNavigate={navigate}
+              onProvinceSaved={handleProvinceSelected}
+            />
+          )}
           {view === 'statistics' && <Statistics onNavigate={navigate} />}
         </motion.div>
       </AnimatePresence>

@@ -75,16 +75,10 @@ export function Results({ scores, answers, onNavigate }: Props) {
 
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
-            onClick={() => onNavigate('province')}
+            onClick={() => onNavigate('statistics')}
             className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors"
           >
-            Seleccionar mi provincia
-          </button>
-          <button
-            onClick={() => onNavigate('statistics')}
-            className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl transition-colors"
-          >
-            Ver estadísticas
+            Ver estadísticas por provincia
           </button>
           <button
             onClick={() => onNavigate('landing')}

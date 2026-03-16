@@ -6,6 +6,7 @@ import { partyMap } from '../data/parties';
 import { parties } from '../data/parties';
 import { SpainMap } from './SpainMap';
 import { ProvinceStats } from './ProvinceStats';
+import { provinceMap } from '../data/provinces';
 
 interface Props {
   onNavigate: (view: AppView) => void;
@@ -171,11 +172,11 @@ export function Statistics({ onNavigate }: Props) {
                             className="border-b border-gray-800/50 hover:bg-gray-800/30"
                             tabIndex={0}
                             role="button"
-                            aria-label={`Ver estadísticas de ${ps.province.replace(/-/g, ' ')}`}
+                            aria-label={`Ver estadísticas de ${provinceMap[ps.province]?.name ?? ps.province}`}
                             onClick={() => setSelectedProvince(ps.province)}
                             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedProvince(ps.province); } }}
                           >
-                            <td className="py-2 px-2 text-gray-300 capitalize">{ps.province.replace(/-/g, ' ')}</td>
+                            <td className="py-2 px-2 text-gray-300">{provinceMap[ps.province]?.name ?? ps.province}</td>
                             <td className="py-2 px-1 text-center text-gray-400">{ps.total}</td>
                             {parties.map((p) => (
                               <td key={p.id} className="py-2 px-1 text-center text-gray-300">
