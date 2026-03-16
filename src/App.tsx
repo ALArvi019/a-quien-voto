@@ -36,13 +36,14 @@ function App() {
   const handleLoadSaved = useCallback(
     (saved: SavedQuiz) => {
       setScores(saved.scores);
+      setAnswers(saved.answers ?? {});
       navigate('results');
     },
     [navigate]
   );
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white" lang="es">
+    <div className="min-h-screen bg-gray-950 text-white">
       <AnimatePresence mode="wait">
         <motion.div
           key={view}

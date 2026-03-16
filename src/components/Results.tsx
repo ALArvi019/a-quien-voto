@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { Answer, AppView, PartyScore } from '../types';
 import { PartyCard } from './PartyCard';
@@ -10,14 +10,16 @@ import { questions } from '../data/questions';
 function useCountUp(target: number, duration = 800) {
   const [value, setValue] = useState(0);
   useEffect(() => {
+    let rafId: number;
     const start = performance.now();
     function tick(now: number) {
       const progress = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setValue(Math.round(eased * target));
-      if (progress < 1) requestAnimationFrame(tick);
+      if (progress < 1) rafId = requestAnimationFrame(tick);
     }
-    requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, [target, duration]);
   return value;
 }
@@ -32,6 +34,11 @@ export function Results({ scores, answers, onNavigate }: Props) {
   const topParty = scores[0] ? partyMap[scores[0].partyId] : null;
   const animatedScore = useCountUp(scores[0]?.totalScore ?? 0);
   const compassCoords = calculateCompassPosition(questions, answers);
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    mainRef.current?.focus();
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -39,7 +46,8 @@ export function Results({ scores, answers, onNavigate }: Props) {
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
             onClick={() => onNavigate('landing')}
-            className="text-gray-400 hover:text-white transition-colors"
+            aria-label="Volver a inicio"
+            className="py-2 px-3 min-h-[44px] flex items-center text-gray-400 hover:text-white transition-colors"
           >
             ← Inicio
           </button>
@@ -47,7 +55,18 @@ export function Results({ scores, answers, onNavigate }: Props) {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
+      <main ref={mainRef} tabIndex={-1} className="max-w-2xl mx-auto px-4 py-8 space-y-8 outline-none">
+        {scores.length === 0 ? (
+          <div className="text-center py-16 space-y-4">
+            <p className="text-gray-400">No hay resultados disponibles.</p>
+            <button
+              onClick={() => onNavigate('quiz')}
+              className="px-6 py-3 min-h-[44px] bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors"
+            >
+              Hacer el test
+            </button>
+          </div>
+        ) : null}
         {topParty && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -59,7 +78,10 @@ export function Results({ scores, answers, onNavigate }: Props) {
             <h1 className="text-3xl md:text-4xl font-bold" style={{ color: topParty.color }}>
               {topParty.name}
             </h1>
-            <p className="text-5xl font-bold text-white">{animatedScore}%</p>
+            <p className="text-5xl font-bold text-white">
+              <span aria-hidden="true">{animatedScore}%</span>
+              <span className="sr-only">{scores[0]?.totalScore}% de afinidad</span>
+            </p>
             <p className="text-gray-400 max-w-md mx-auto text-sm">{topParty.description}</p>
           </motion.div>
         )}
@@ -76,13 +98,13 @@ export function Results({ scores, answers, onNavigate }: Props) {
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             onClick={() => onNavigate('statistics')}
-            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors"
+            className="flex-1 px-6 py-3 min-h-[44px] bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors"
           >
             Ver estadísticas por provincia
           </button>
           <button
             onClick={() => onNavigate('landing')}
-            className="flex-1 px-6 py-3 border border-gray-700 hover:border-gray-500 text-gray-300 font-semibold rounded-xl transition-colors"
+            className="flex-1 px-6 py-3 min-h-[44px] border border-gray-700 hover:border-gray-500 text-gray-300 font-semibold rounded-xl transition-colors"
           >
             Repetir test
           </button>

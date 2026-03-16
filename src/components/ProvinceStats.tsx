@@ -33,7 +33,7 @@ export function ProvinceStats({ data }: Props) {
               <div key={party.id} className="flex items-center gap-3">
                 <img src={party.logo} alt={party.shortName} className="w-7 h-7 rounded-lg" loading="lazy" />
                 <span className="w-20 text-sm text-gray-300">{party.shortName}</span>
-                <div className="flex-1 h-3 bg-gray-800 rounded-full overflow-hidden">
+                <div className="flex-1 h-3 bg-gray-800 rounded-full overflow-hidden" role="meter" aria-valuenow={avg} aria-valuemin={0} aria-valuemax={100} aria-label={`${party.shortName}: ${avg}%`}>
                   <motion.div
                     className="h-full rounded-full"
                     style={{ backgroundColor: party.color }}

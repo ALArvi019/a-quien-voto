@@ -35,7 +35,9 @@ export async function getProvinceStats(): Promise<ProvinceStatData[]> {
     grouped[prov].count++;
     const ps = row.party_scores as Record<PartyId, number>;
     for (const pid of Object.keys(ps) as PartyId[]) {
-      grouped[prov].scores[pid].push(ps[pid]);
+      if (grouped[prov].scores[pid]) {
+        grouped[prov].scores[pid].push(ps[pid]);
+      }
     }
   }
 

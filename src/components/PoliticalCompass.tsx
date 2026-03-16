@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import type { CompassCoords } from '../utils/compass';
 
 interface Props {
@@ -27,37 +26,36 @@ function clamp(v: number): number {
   return Math.max(0, Math.min(255, v));
 }
 
+// Pre-computed heatmap cells (constant, no need to recalculate per render)
+const STEP = 20;
+const CELLS: { x: number; y: number; color: string }[] = [];
+for (let gx = 0; gx < SIZE; gx += STEP) {
+  for (let gy = 0; gy < SIZE; gy += STEP) {
+    const normX = ((gx + STEP / 2) / SIZE) * 20 - 10;
+    const normY = ((gy + STEP / 2) / SIZE) * 20 - 10;
+    CELLS.push({ x: gx, y: gy, color: getHeatmapColor(normX, normY) });
+  }
+}
+
 export function PoliticalCompass({ coords }: Props) {
   const px = coordToPixel(coords.economic);
   const py = coordToPixel(coords.social);
-
-  // Generate heatmap gradient cells
-  const cells: { x: number; y: number; color: string }[] = [];
-  const step = 20;
-  for (let gx = 0; gx < SIZE; gx += step) {
-    for (let gy = 0; gy < SIZE; gy += step) {
-      const normX = ((gx + step / 2) / SIZE) * 20 - 10;
-      const normY = ((gy + step / 2) / SIZE) * 20 - 10;
-      cells.push({ x: gx, y: gy, color: getHeatmapColor(normX, normY) });
-    }
-  }
-
   const quadrantLabel = getQuadrantLabel(coords.economic, coords.social);
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-gray-300">Tu brújula política</h3>
+      <h2 className="text-lg font-semibold text-gray-300">Tu brújula política</h2>
       <div className="flex flex-col items-center gap-4">
-        <div className="relative" style={{ width: SIZE, height: SIZE }}>
+        <div className="relative w-full" style={{ maxWidth: SIZE, aspectRatio: '1' }}>
           {/* Heatmap background */}
-          <svg width={SIZE} height={SIZE} className="rounded-xl overflow-hidden">
-            {cells.map((cell, i) => (
+          <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full h-full rounded-xl overflow-hidden" role="img" aria-label={`Brújula política. Tu posición: ${quadrantLabel}`}>
+            {CELLS.map((cell, i) => (
               <rect
                 key={i}
                 x={cell.x}
                 y={cell.y}
-                width={step}
-                height={step}
+                width={STEP}
+                height={STEP}
                 fill={cell.color}
                 opacity={0.3}
               />
@@ -68,31 +66,31 @@ export function PoliticalCompass({ coords }: Props) {
             <line x1={0} y1={HALF} x2={SIZE} y2={HALF} stroke="rgba(255,255,255,0.3)" strokeWidth={1} />
 
             {/* Quadrant labels */}
-            <text x={HALF / 2} y={HALF / 2} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={11} fontWeight="bold">
+            <text x={HALF / 2} y={HALF / 2} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize={11} fontWeight="bold">
               Izquierda
             </text>
-            <text x={HALF / 2} y={HALF / 2 + 14} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={11} fontWeight="bold">
+            <text x={HALF / 2} y={HALF / 2 + 14} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize={11} fontWeight="bold">
               Autoritaria
             </text>
 
-            <text x={HALF + HALF / 2} y={HALF / 2} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={11} fontWeight="bold">
+            <text x={HALF + HALF / 2} y={HALF / 2} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize={11} fontWeight="bold">
               Derecha
             </text>
-            <text x={HALF + HALF / 2} y={HALF / 2 + 14} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={11} fontWeight="bold">
+            <text x={HALF + HALF / 2} y={HALF / 2 + 14} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize={11} fontWeight="bold">
               Autoritaria
             </text>
 
-            <text x={HALF / 2} y={HALF + HALF / 2} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={11} fontWeight="bold">
+            <text x={HALF / 2} y={HALF + HALF / 2} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize={11} fontWeight="bold">
               Izquierda
             </text>
-            <text x={HALF / 2} y={HALF + HALF / 2 + 14} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={11} fontWeight="bold">
+            <text x={HALF / 2} y={HALF + HALF / 2 + 14} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize={11} fontWeight="bold">
               Libertaria
             </text>
 
-            <text x={HALF + HALF / 2} y={HALF + HALF / 2} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={11} fontWeight="bold">
+            <text x={HALF + HALF / 2} y={HALF + HALF / 2} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize={11} fontWeight="bold">
               Derecha
             </text>
-            <text x={HALF + HALF / 2} y={HALF + HALF / 2 + 14} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize={11} fontWeight="bold">
+            <text x={HALF + HALF / 2} y={HALF + HALF / 2 + 14} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize={11} fontWeight="bold">
               Libertaria
             </text>
 
@@ -112,37 +110,17 @@ export function PoliticalCompass({ coords }: Props) {
 
             {/* Border */}
             <rect x={0} y={0} width={SIZE} height={SIZE} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={2} rx={12} />
+
+            {/* User position dot */}
+            <circle cx={px} cy={py} r={12} fill="rgba(255,255,255,0.15)" />
+            <circle cx={px} cy={py} r={8} fill="white" stroke="#111827" strokeWidth={2} />
           </svg>
-
-          {/* User position dot */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-            className="absolute w-5 h-5 rounded-full bg-white border-2 border-gray-900 shadow-lg shadow-white/30"
-            style={{
-              left: px - 10,
-              top: py - 10,
-            }}
-          />
-
-          {/* Glow effect around dot */}
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.4 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="absolute w-10 h-10 rounded-full bg-white/20 blur-sm"
-            style={{
-              left: px - 20,
-              top: py - 20,
-            }}
-          />
         </div>
 
         {/* Coordinates and label */}
         <div className="text-center space-y-1">
           <p className="text-sm font-semibold text-white">{quadrantLabel}</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             Económico: <span className={coords.economic < 0 ? 'text-red-400' : 'text-blue-400'}>
               {coords.economic > 0 ? '+' : ''}{coords.economic}
             </span>

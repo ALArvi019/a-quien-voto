@@ -8,7 +8,7 @@ export function Footer() {
             href="https://github.com/ALArvi019/a-quien-voto"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-colors underline"
+            className="py-2 inline-flex items-center min-h-[44px] text-gray-400 hover:text-white transition-colors underline"
           >
             Código fuente
           </a>

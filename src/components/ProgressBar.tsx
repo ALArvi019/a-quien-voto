@@ -14,7 +14,14 @@ export function ProgressBar({ current, total }: Props) {
         <span>Pregunta {current + 1} de {total}</span>
         <span>{Math.round(pct)}%</span>
       </div>
-      <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+      <div
+        className="h-2 bg-gray-800 rounded-full overflow-hidden"
+        role="progressbar"
+        aria-valuenow={current}
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-label={`Pregunta ${current + 1} de ${total}`}
+      >
         <motion.div
           className="h-full bg-white rounded-full"
           initial={{ width: 0 }}

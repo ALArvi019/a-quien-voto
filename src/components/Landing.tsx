@@ -19,7 +19,7 @@ export function Landing({ onNavigate, onLoadSaved }: Props) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col">
       {/* Hero */}
       <section className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         <motion.div
@@ -84,9 +84,10 @@ export function Landing({ onNavigate, onLoadSaved }: Props) {
                     </div>
                     <button
                       onClick={() => onLoadSaved(sq)}
-                      className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-sm text-white rounded-lg transition-colors shrink-0"
+                      aria-label={`Ver test de ${topParty?.shortName} del ${dateStr}`}
+                      className="px-4 py-2.5 min-h-[44px] bg-gray-800 hover:bg-gray-700 text-sm text-white rounded-lg transition-colors shrink-0"
                     >
-                      Ver
+                      Ver →
                     </button>
                     <button
                       onClick={() => handleDelete(sq.id)}
@@ -110,15 +111,15 @@ export function Landing({ onNavigate, onLoadSaved }: Props) {
           <h2 className="text-lg font-bold text-white">¿Cómo funciona?</h2>
           <ol className="space-y-4 text-sm text-gray-400">
             <li className="flex gap-3">
-              <span className="text-white font-bold shrink-0">1.</span>
+              <span className="text-white font-bold shrink-0" aria-hidden="true">1.</span>
               <span>Responde preguntas sobre economía, sanidad, vivienda, inmigración y más.</span>
             </li>
             <li className="flex gap-3">
-              <span className="text-white font-bold shrink-0">2.</span>
+              <span className="text-white font-bold shrink-0" aria-hidden="true">2.</span>
               <span>Comparamos tus respuestas con las posiciones reales de cada partido.</span>
             </li>
             <li className="flex gap-3">
-              <span className="text-white font-bold shrink-0">3.</span>
+              <span className="text-white font-bold shrink-0" aria-hidden="true">3.</span>
               <span>Ves tu ranking con % de afinidad y desglose por temas.</span>
             </li>
           </ol>
@@ -154,12 +155,13 @@ export function Landing({ onNavigate, onLoadSaved }: Props) {
           </div>
           <button
             onClick={() => onNavigate('statistics')}
-            className="px-4 py-2 text-sm text-gray-300 hover:text-white border border-gray-700 hover:border-gray-500 rounded-lg transition-colors shrink-0"
+            aria-label="Ver estadísticas por provincia"
+            className="px-4 py-2 min-h-[44px] flex items-center text-sm text-gray-300 hover:text-white border border-gray-700 hover:border-gray-500 rounded-lg transition-colors shrink-0"
           >
             Ver →
           </button>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

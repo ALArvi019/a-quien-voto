@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { AppView, PartyId, PartyScore } from '../types';
 import { SpainMap } from './SpainMap';
@@ -14,26 +14,37 @@ interface Props {
 export function ProvinceSelector({ scores, onNavigate, onProvinceSaved }: Props) {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
+  const submittedRef = useRef(false);
 
   const selectedName = provinces.find((p) => p.id === selectedProvince)?.name;
 
   const handleConfirm = async () => {
-    if (!selectedProvince || scores.length === 0) return;
+    if (!selectedProvince || scores.length === 0 || submittedRef.current) return;
+    submittedRef.current = true;
     setSaving(true);
+    setSaveError(false);
 
-    const partyScores = {} as Record<PartyId, number>;
-    for (const s of scores) {
-      partyScores[s.partyId] = s.totalScore;
+    try {
+      const partyScores = {} as Record<PartyId, number>;
+      for (const s of scores) {
+        partyScores[s.partyId] = s.totalScore;
+      }
+
+      await saveResult({
+        province: selectedProvince,
+        party_scores: partyScores,
+        top_party: scores[0].partyId,
+      });
+
+      setSaving(false);
+      onProvinceSaved();
+    } catch {
+      setSaving(false);
+      setSaveError(true);
+      // Navigate anyway after brief delay so user sees the warning
+      setTimeout(() => onProvinceSaved(), 2000);
     }
-
-    await saveResult({
-      province: selectedProvince,
-      party_scores: partyScores,
-      top_party: scores[0].partyId,
-    });
-
-    setSaving(false);
-    onProvinceSaved();
   };
 
   return (
@@ -42,7 +53,8 @@ export function ProvinceSelector({ scores, onNavigate, onProvinceSaved }: Props)
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
             onClick={() => onNavigate('landing')}
-            className="text-gray-400 hover:text-white transition-colors"
+            aria-label="Volver a inicio"
+            className="py-2 px-3 min-h-[44px] flex items-center text-gray-400 hover:text-white transition-colors"
           >
             ← Inicio
           </button>
@@ -97,10 +109,14 @@ export function ProvinceSelector({ scores, onNavigate, onProvinceSaved }: Props)
             <button
               onClick={handleConfirm}
               disabled={saving}
-              className="px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors"
+              className="px-8 py-3 min-h-[44px] bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors"
             >
               {saving ? 'Guardando...' : 'Ver mis resultados →'}
             </button>
+
+            {saveError && (
+              <p className="text-sm text-yellow-400">No se pudo guardar la estadística, pero tus resultados están disponibles.</p>
+            )}
           </motion.div>
         )}
 
@@ -108,7 +124,7 @@ export function ProvinceSelector({ scores, onNavigate, onProvinceSaved }: Props)
           <div className="text-center pt-2">
             <button
               onClick={onProvinceSaved}
-              className="text-sm text-gray-500 hover:text-gray-400 transition-colors underline underline-offset-4"
+              className="py-2 min-h-[44px] text-sm text-gray-500 hover:text-gray-400 transition-colors underline underline-offset-4"
             >
               Saltar y ver resultados sin contribuir
             </button>

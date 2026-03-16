@@ -27,6 +27,7 @@ export function PartyCard({ score, rank }: Props) {
       <button
         onClick={() => setExpanded(!expanded)}
         aria-expanded={expanded}
+        aria-controls={`party-detail-${score.partyId}`}
         className="w-full px-5 py-4 flex items-center gap-4"
       >
         <span
@@ -53,6 +54,7 @@ export function PartyCard({ score, rank }: Props) {
         {expanded && (
           <motion.div
             key="content"
+            id={`party-detail-${score.partyId}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -60,7 +62,7 @@ export function PartyCard({ score, rank }: Props) {
             className="px-5 pb-5 space-y-4"
           >
             {/* Progress bar */}
-            <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
+            <div className="h-3 bg-gray-800 rounded-full overflow-hidden" role="meter" aria-valuenow={score.totalScore} aria-valuemin={0} aria-valuemax={100} aria-label={`${party.shortName}: ${score.totalScore}% de afinidad`}>
               <motion.div
                 className="h-full rounded-full"
                 style={{ backgroundColor: party.color }}
@@ -72,15 +74,15 @@ export function PartyCard({ score, rank }: Props) {
 
             {/* Category breakdown */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-300 mb-2">Afinidad por tema</h4>
+              <h3 className="text-sm font-semibold text-gray-300 mb-2">Afinidad por tema</h3>
               <div className="grid gap-2">
                 {categories.map((cat) => {
                   const catScore = Math.round(score.categoryScores[cat.id]);
                   return (
                     <div key={cat.id} className="flex items-center gap-2 text-sm">
                       <span className="w-5">{cat.icon}</span>
-                      <span className="w-36 text-gray-400 truncate">{cat.name}</span>
-                      <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
+                      <span className="w-24 sm:w-36 text-gray-400 truncate">{cat.name}</span>
+                      <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden" role="meter" aria-valuenow={catScore} aria-valuemin={0} aria-valuemax={100} aria-label={`${cat.name}: ${catScore}%`}>
                         <div
                           className="h-full rounded-full"
                           style={{ backgroundColor: party.color, width: `${catScore}%` }}
@@ -95,7 +97,7 @@ export function PartyCard({ score, rank }: Props) {
 
             {/* Top reasons */}
             <div>
-              <h4 className="text-sm font-semibold text-green-400 mb-1">Mayor coincidencia</h4>
+              <h3 className="text-sm font-semibold text-green-400 mb-1">Mayor coincidencia</h3>
               <ul className="text-sm text-gray-400 space-y-1">
                 {score.topReasons.map((r) => {
                   const q = questionMap[r.questionId];
@@ -111,7 +113,7 @@ export function PartyCard({ score, rank }: Props) {
             </div>
 
             <div>
-              <h4 className="text-sm font-semibold text-red-400 mb-1">Mayor diferencia</h4>
+              <h3 className="text-sm font-semibold text-red-400 mb-1">Mayor diferencia</h3>
               <ul className="text-sm text-gray-400 space-y-1">
                 {score.bottomReasons.map((r) => {
                   const q = questionMap[r.questionId];
@@ -130,7 +132,7 @@ export function PartyCard({ score, rank }: Props) {
               href={party.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block text-sm px-4 py-2 rounded-lg border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 transition-colors"
+              className="inline-flex items-center min-h-[44px] text-sm px-4 py-2 rounded-lg border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 transition-colors"
             >
               Visitar web del partido →
             </a>

@@ -18,7 +18,7 @@ export function saveQuiz(answers: Record<string, Answer>, scores: PartyScore[]):
     date: new Date().toISOString(),
     answers,
     scores,
-    topParty: scores[0].partyId,
+    topParty: scores[0]?.partyId ?? 'pp',
   };
   const history = getSavedQuizzes();
   history.unshift(saved);

@@ -53,7 +53,7 @@ export function SpainMap({ selected, onSelect, colorMap }: Props) {
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="w-full h-auto"
         xmlns="http://www.w3.org/2000/svg"
-        role="img"
+        role="group"
         aria-label="Mapa de España por provincias"
       >
         {/* Canary Islands box */}
@@ -91,9 +91,15 @@ export function SpainMap({ selected, onSelect, colorMap }: Props) {
               stroke="#1f2937"
               strokeWidth={isSelected || isHovered ? 2 : 0.5}
               className="transition-[fill,opacity,stroke-width] duration-150 cursor-pointer"
+              tabIndex={0}
+              role="button"
+              aria-label={prov.name}
               onClick={() => onSelect(prov.id)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(prov.id); } }}
               onMouseEnter={() => setHovered(prov.id)}
               onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered(prov.id)}
+              onBlur={() => setHovered(null)}
               style={{
                 opacity: isSelected ? 1 : isHovered ? 0.9 : 0.75,
               }}

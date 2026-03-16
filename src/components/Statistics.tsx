@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { AppView, PartyId, ProvinceStatData } from '../types';
 import { getProvinceStats, getNationalStats } from '../lib/supabase';
@@ -21,27 +21,31 @@ export function Statistics({ onNavigate }: Props) {
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    let ignore = false;
     setLoading(true);
     setError(false);
     async function load() {
       try {
         const [ps, ns] = await Promise.all([getProvinceStats(), getNationalStats()]);
-        setProvStats(ps);
-        setNational(ns);
+        if (!ignore) { setProvStats(ps); setNational(ns); }
       } catch {
-        setError(true);
+        if (!ignore) setError(true);
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     }
     load();
+    return () => { ignore = true; };
   }, [retryCount]);
 
-  const colorMap: Record<string, string> = {};
-  for (const ps of provStats) {
-    const party = partyMap[ps.topParty];
-    if (party) colorMap[ps.province] = party.color;
-  }
+  const colorMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const ps of provStats) {
+      const party = partyMap[ps.topParty];
+      if (party) map[ps.province] = party.color;
+    }
+    return map;
+  }, [provStats]);
 
   const selectedData = provStats.find((p) => p.province === selectedProvince);
 
@@ -51,7 +55,8 @@ export function Statistics({ onNavigate }: Props) {
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <button
             onClick={() => onNavigate('landing')}
-            className="text-gray-400 hover:text-white transition-colors"
+            aria-label="Volver a inicio"
+            className="py-2 px-3 min-h-[44px] flex items-center text-gray-400 hover:text-white transition-colors"
           >
             ← Inicio
           </button>
@@ -110,7 +115,7 @@ export function Statistics({ onNavigate }: Props) {
                     <div key={party.id} className="flex items-center gap-3">
                       <img src={party.logo} alt={party.shortName} className="w-8 h-8 rounded-lg" loading="lazy" />
                       <span className="w-20 text-sm text-gray-300 font-medium">{party.shortName}</span>
-                      <div className="flex-1 h-4 bg-gray-800 rounded-full overflow-hidden">
+                      <div className="flex-1 h-4 bg-gray-800 rounded-full overflow-hidden" role="meter" aria-valuenow={avg} aria-valuemin={0} aria-valuemax={100} aria-label={`${party.shortName}: ${avg}%`}>
                         <motion.div
                           className="h-full rounded-full"
                           style={{ backgroundColor: party.color }}
@@ -169,17 +174,16 @@ export function Statistics({ onNavigate }: Props) {
                         .map((ps) => (
                           <tr
                             key={ps.province}
-                            className="border-b border-gray-800/50 hover:bg-gray-800/30"
+                            className="border-b border-gray-800/50 hover:bg-gray-800/30 cursor-pointer"
                             tabIndex={0}
-                            role="button"
                             aria-label={`Ver estadísticas de ${provinceMap[ps.province]?.name ?? ps.province}`}
                             onClick={() => setSelectedProvince(ps.province)}
                             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedProvince(ps.province); } }}
                           >
-                            <td className="py-2 px-2 text-gray-300">{provinceMap[ps.province]?.name ?? ps.province}</td>
-                            <td className="py-2 px-1 text-center text-gray-400">{ps.total}</td>
+                            <td className="py-3 px-2 text-gray-300">{provinceMap[ps.province]?.name ?? ps.province}</td>
+                            <td className="py-3 px-1 text-center text-gray-400">{ps.total}</td>
                             {parties.map((p) => (
-                              <td key={p.id} className="py-2 px-1 text-center text-gray-300">
+                              <td key={p.id} className="py-3 px-1 text-center text-gray-300">
                                 {ps.avgScores[p.id]}%
                               </td>
                             ))}

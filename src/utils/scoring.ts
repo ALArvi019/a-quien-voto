@@ -32,17 +32,16 @@ export function calculateScores(
     }
 
     const sorted = [...alignments].sort((a, b) => b.alignment - a.alignment);
-    const topReasons: Reason[] = sorted.slice(0, 3).map((a) => ({
+    const topReasons: Reason[] = sorted.slice(0, Math.min(3, sorted.length)).map((a) => ({
       questionId: a.questionId,
       alignment: a.alignment,
     }));
-    const bottomReasons: Reason[] = sorted
-      .slice(-3)
-      .reverse()
-      .map((a) => ({
-        questionId: a.questionId,
-        alignment: a.alignment,
-      }));
+    const bottomReasons: Reason[] = sorted.length > 3
+      ? sorted.slice(-Math.min(3, sorted.length - 3)).reverse().map((a) => ({
+          questionId: a.questionId,
+          alignment: a.alignment,
+        }))
+      : [];
 
     return {
       partyId: party.id as PartyId,

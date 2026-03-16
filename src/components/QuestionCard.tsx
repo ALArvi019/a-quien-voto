@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Answer, Question } from '../types';
 import { categoryMap } from '../data/categories';
@@ -18,16 +19,23 @@ const answerOptions: { value: Answer; label: string; color: string }[] = [
 
 export function QuestionCard({ question, onAnswer, currentAnswer }: Props) {
   const category = categoryMap[question.category];
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    cardRef.current?.focus();
+  }, [question.id]);
 
   return (
     <AnimatePresence mode="wait">
       <motion.div
         key={question.id}
+        ref={cardRef}
+        tabIndex={-1}
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -50 }}
         transition={{ duration: 0.3 }}
-        className="space-y-6"
+        className="space-y-6 outline-none"
       >
         <div className="space-y-3">
           {category && (
@@ -43,12 +51,11 @@ export function QuestionCard({ question, onAnswer, currentAnswer }: Props) {
           </p>
         </div>
 
-        <div role="radiogroup" aria-label="Tu respuesta" className="grid gap-3">
+        <div role="group" aria-label="Tu respuesta" className="grid gap-3">
           {answerOptions.map((opt) => (
             <button
               key={opt.value}
-              role="radio"
-              aria-checked={currentAnswer === opt.value}
+              aria-pressed={currentAnswer === opt.value}
               onClick={() => onAnswer(question.id, opt.value)}
               className={`w-full text-left px-5 py-3 rounded-xl text-white font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950 outline-none
                 ${currentAnswer === opt.value

@@ -2,8 +2,8 @@
 
 @theme {
   --color-pp: #1e40af;
-  --color-psoe: #dc2626;
-  --color-vox: #16a34a;
+  --color-psoe: #ef4444;
+  --color-vox: #22c55e;
   --color-podemos: #7c3aed;
   --color-salf: #f97316;
 }
@@ -13,7 +13,7 @@ button:focus-visible,
 a:focus-visible,
 select:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid white;
+  outline: 2px solid #3b82f6;
   outline-offset: 2px;
 }
 
