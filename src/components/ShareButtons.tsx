@@ -4,7 +4,10 @@ import { partyMap } from '../data/parties';
 
 const SITE_URL = 'https://alarvi019.github.io/a-quien-voto/';
 const CARD_W = 600;
-const CARD_H = 400;
+const CARD_H_SIMPLE = 340;
+const CARD_H_FULL = 400;
+
+type CardMode = 'simple' | 'full';
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
@@ -24,54 +27,105 @@ interface Props {
   scores: PartyScore[];
 }
 
-function drawCard(canvas: HTMLCanvasElement, scores: PartyScore[]) {
-  const ctx = canvas.getContext('2d');
-  if (!ctx || scores.length === 0) return;
-
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = CARD_W * dpr;
-  canvas.height = CARD_H * dpr;
-  ctx.scale(dpr, dpr);
-
-  // Background gradient
-  const bg = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
+function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, partyColor: string) {
+  const bg = ctx.createLinearGradient(0, 0, w, h);
   bg.addColorStop(0, '#0a0a1a');
   bg.addColorStop(1, '#111827');
   ctx.fillStyle = bg;
-  roundRect(ctx, 0, 0, CARD_W, CARD_H, 16);
+  roundRect(ctx, 0, 0, w, h, 16);
   ctx.fill();
 
-  // Subtle border
   ctx.strokeStyle = 'rgba(255,255,255,0.08)';
   ctx.lineWidth = 1;
-  roundRect(ctx, 0.5, 0.5, CARD_W - 1, CARD_H - 1, 16);
+  roundRect(ctx, 0.5, 0.5, w - 1, h - 1, 16);
   ctx.stroke();
+
+  const glow = ctx.createRadialGradient(w / 2, 130, 0, w / 2, 130, 180);
+  glow.addColorStop(0, partyColor + '22');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+}
+
+function drawHeader(ctx: CanvasRenderingContext2D, w: number, partyName: string, partyColor: string, score: number) {
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '500 14px system-ui, -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Mi mayor afinidad es con', w / 2, 48);
+
+  ctx.fillStyle = partyColor;
+  ctx.font = 'bold 32px system-ui, -apple-system, sans-serif';
+  ctx.fillText(partyName, w / 2, 88);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 56px system-ui, -apple-system, sans-serif';
+  ctx.fillText(`${score}%`, w / 2, 155);
+}
+
+function drawFooter(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '500 12px system-ui, -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('¿A quién voto? — Haz el test en alarvi019.github.io/a-quien-voto', w / 2, h - 16);
+}
+
+function drawSimpleCard(canvas: HTMLCanvasElement, scores: PartyScore[]) {
+  const ctx = canvas.getContext('2d');
+  if (!ctx || scores.length === 0) return;
+
+  const h = CARD_H_SIMPLE;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = CARD_W * dpr;
+  canvas.height = h * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
   const top = scores[0];
   const party = partyMap[top.partyId];
 
-  // Accent glow behind score
-  const glow = ctx.createRadialGradient(CARD_W / 2, 130, 0, CARD_W / 2, 130, 180);
-  glow.addColorStop(0, party.color + '22');
-  glow.addColorStop(1, 'transparent');
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, CARD_W, CARD_H);
+  drawBackground(ctx, CARD_W, h, party.color);
+  drawHeader(ctx, CARD_W, party.name, party.color, top.totalScore);
 
-  // Header label
+  // Ideology subtitle
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '500 14px system-ui, -apple-system, sans-serif';
+  ctx.font = '500 16px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Mi mayor afinidad es con', CARD_W / 2, 48);
+  ctx.fillText(party.ideology, CARD_W / 2, 195);
 
-  // Party name
-  ctx.fillStyle = party.color;
-  ctx.font = 'bold 32px system-ui, -apple-system, sans-serif';
-  ctx.fillText(party.name, CARD_W / 2, 88);
+  // CTA
+  ctx.fillStyle = '#d1d5db';
+  ctx.font = '500 18px system-ui, -apple-system, sans-serif';
+  ctx.fillText('¿Con quién coincides tú?', CARD_W / 2, 260);
 
-  // Score
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 56px system-ui, -apple-system, sans-serif';
-  ctx.fillText(`${top.totalScore}%`, CARD_W / 2, 155);
+  // Party color dots
+  const dotColors = scores.map(s => partyMap[s.partyId].color);
+  const dotSpacing = 40;
+  const dotsW = (dotColors.length - 1) * dotSpacing;
+  const dotsStartX = (CARD_W - dotsW) / 2;
+  dotColors.forEach((color, i) => {
+    ctx.beginPath();
+    ctx.arc(dotsStartX + i * dotSpacing, 290, 6, 0, Math.PI * 2);
+    ctx.fillStyle = i === 0 ? color : color + '55';
+    ctx.fill();
+  });
+
+  drawFooter(ctx, CARD_W, h);
+}
+
+function drawFullCard(canvas: HTMLCanvasElement, scores: PartyScore[]) {
+  const ctx = canvas.getContext('2d');
+  if (!ctx || scores.length === 0) return;
+
+  const h = CARD_H_FULL;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = CARD_W * dpr;
+  canvas.height = h * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const top = scores[0];
+  const party = partyMap[top.partyId];
+
+  drawBackground(ctx, CARD_W, h, party.color);
+  drawHeader(ctx, CARD_W, party.name, party.color, top.totalScore);
 
   // Divider
   ctx.strokeStyle = 'rgba(255,255,255,0.1)';
@@ -81,30 +135,27 @@ function drawCard(canvas: HTMLCanvasElement, scores: PartyScore[]) {
   ctx.lineTo(CARD_W - 40, 178);
   ctx.stroke();
 
-  // Ranking bars — dynamic spacing
+  // Ranking bars
   const barStartX = 160;
   const barMaxW = 350;
   const barH = 22;
   const startY = 196;
-  const availableH = CARD_H - startY - 42;
+  const availableH = h - startY - 42;
   const gap = Math.min(36, Math.floor(availableH / scores.length));
 
   scores.forEach((s, i) => {
     const p = partyMap[s.partyId];
     const y = startY + i * gap;
 
-    // Party name
     ctx.fillStyle = '#d1d5db';
     ctx.font = '600 13px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'right';
     ctx.fillText(p.shortName, barStartX - 12, y + barH / 2 + 4);
 
-    // Bar background
     ctx.fillStyle = 'rgba(255,255,255,0.06)';
     roundRect(ctx, barStartX, y, barMaxW, barH, 6);
     ctx.fill();
 
-    // Bar fill
     const fillW = Math.max(barMaxW * (s.totalScore / 100), 8);
     const barGrad = ctx.createLinearGradient(barStartX, 0, barStartX + fillW, 0);
     barGrad.addColorStop(0, p.color);
@@ -113,34 +164,38 @@ function drawCard(canvas: HTMLCanvasElement, scores: PartyScore[]) {
     roundRect(ctx, barStartX, y, fillW, barH, 6);
     ctx.fill();
 
-    // Score label
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(`${s.totalScore}%`, barStartX + fillW + 8, y + barH / 2 + 4);
   });
 
-  // Footer
-  ctx.fillStyle = '#6b7280';
-  ctx.font = '500 12px system-ui, -apple-system, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('¿A quién voto? — Haz el test en alarvi019.github.io/a-quien-voto', CARD_W / 2, CARD_H - 16);
+  drawFooter(ctx, CARD_W, h);
 }
 
 export function ShareButtons({ scores }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [copied, setCopied] = useState(false);
+  const [cardMode, setCardMode] = useState<CardMode>('simple');
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const top = scores[0];
-  const party = partyMap[top.partyId];
-  const shareText = `Mi mayor afinidad política es con ${party.shortName} (${top.totalScore}%). ¿Con quién coincides tú? Haz el test:`;
+  const top = scores.length > 0 ? scores[0] : null;
+  const party = top ? partyMap[top.partyId] : null;
+  const shareText = party && top
+    ? `Mi mayor afinidad política es con ${party.shortName} (${top.totalScore}%). ¿Con quién coincides tú? Haz el test:`
+    : '';
   const encodedText = encodeURIComponent(shareText);
   const encodedUrl = encodeURIComponent(SITE_URL);
+  const cardH = cardMode === 'simple' ? CARD_H_SIMPLE : CARD_H_FULL;
 
   useEffect(() => {
-    if (canvasRef.current) drawCard(canvasRef.current, scores);
-  }, [scores]);
+    if (!canvasRef.current || scores.length === 0) return;
+    if (cardMode === 'simple') {
+      drawSimpleCard(canvasRef.current, scores);
+    } else {
+      drawFullCard(canvasRef.current, scores);
+    }
+  }, [scores, cardMode]);
 
   useEffect(() => {
     return () => {
@@ -232,18 +287,59 @@ export function ShareButtons({ scores }: Props) {
 
   const hasNativeShare = typeof navigator !== 'undefined' && !!navigator.share;
 
+  if (!top || !party) return null;
+
   return (
     <section className="space-y-4" aria-label="Compartir resultado">
       <h2 className="text-lg font-semibold text-gray-300">Comparte tu resultado</h2>
+
+      {/* Card mode selector */}
+      <fieldset className="flex gap-2 justify-center border-0 p-0 m-0">
+        <legend className="sr-only">Tipo de imagen para compartir</legend>
+        <label
+          className={`px-4 py-2 min-h-[44px] rounded-xl text-sm font-medium transition-colors inline-flex items-center cursor-pointer focus-within:ring-2 focus-within:ring-blue-400 focus-within:ring-offset-2 focus-within:ring-offset-gray-950 ${
+            cardMode === 'simple'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-800 text-gray-400 hover:text-gray-200 border border-gray-700'
+          }`}
+        >
+          <input
+            type="radio"
+            name="card-mode"
+            value="simple"
+            checked={cardMode === 'simple'}
+            onChange={() => setCardMode('simple')}
+            className="sr-only"
+          />
+          Solo mi partido
+        </label>
+        <label
+          className={`px-4 py-2 min-h-[44px] rounded-xl text-sm font-medium transition-colors inline-flex items-center cursor-pointer focus-within:ring-2 focus-within:ring-blue-400 focus-within:ring-offset-2 focus-within:ring-offset-gray-950 ${
+            cardMode === 'full'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-800 text-gray-400 hover:text-gray-200 border border-gray-700'
+          }`}
+        >
+          <input
+            type="radio"
+            name="card-mode"
+            value="full"
+            checked={cardMode === 'full'}
+            onChange={() => setCardMode('full')}
+            className="sr-only"
+          />
+          Con ranking completo
+        </label>
+      </fieldset>
 
       {/* Visual card preview */}
       <div className="flex justify-center overflow-x-auto">
         <canvas
           ref={canvasRef}
           className="rounded-2xl w-full max-w-[600px]"
-          style={{ aspectRatio: `${CARD_W}/${CARD_H}` }}
+          style={{ aspectRatio: `${CARD_W}/${cardH}` }}
           role="img"
-          aria-label={`Card de resultado: mayor afinidad con ${party.name} al ${top.totalScore}%`}
+          aria-label={`Card de resultado: mayor afinidad con ${party.name} al ${top.totalScore}%${cardMode === 'full' ? ' con ranking completo' : ''}`}
         >Mayor afinidad con {party.name} al {top.totalScore}%</canvas>
       </div>
 
@@ -278,7 +374,7 @@ export function ShareButtons({ scores }: Props) {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Compartir en ${link.name}`}
+            aria-label={`Compartir en ${link.name} (abre en nueva ventana)`}
             className={`inline-flex items-center gap-2 px-3 py-2.5 min-h-[44px] min-w-[44px] rounded-xl text-white font-medium transition-colors ${link.color}`}
           >
             {link.icon}
@@ -288,7 +384,6 @@ export function ShareButtons({ scores }: Props) {
 
         <button
           onClick={copyLink}
-          aria-live="polite"
           className="inline-flex items-center gap-2 px-3 py-2.5 min-h-[44px] min-w-[44px] rounded-xl text-gray-300 font-medium bg-gray-800/50 border border-gray-700 hover:border-gray-500 transition-colors"
         >
           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-current" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -301,7 +396,7 @@ export function ShareButtons({ scores }: Props) {
               </>
             )}
           </svg>
-          <span className="text-sm">{copied ? 'Copiado' : 'Copiar'}</span>
+          <span className="text-sm" aria-live="polite">{copied ? 'Copiado' : 'Copiar'}</span>
         </button>
       </div>
     </section>
